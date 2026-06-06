@@ -1,10 +1,12 @@
-print("🔥 BOT FILE IS RUNNING")
-
+import multiprocessing
 import os
 import yt_dlp
 from telegram import Update
 from telegram.ext import ApplicationBuilder,MessageHandler,filters,ContextTypes
 
+
+
+multiprocessing.set_start_method("spawn", force=True)
 TOKEN = os.getenv("TOKEN")
 app = ApplicationBuilder().token(TOKEN).build()
 def is_valid(url):
@@ -58,13 +60,12 @@ def home():
     return "Bot is running"
 
 def run_web():
-    flask_app.run(host="0.0.0.0", port=10000)
+    flask_app.run(host="0.0.0.0", port=10000, use_reloader=False)
 
 def run_bot():
     app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
-    import threading
     print("🔥 BOT FILE IS RUNNING")
     threading.Thread(target=run_web, daemon=True).start()
     run_bot()
