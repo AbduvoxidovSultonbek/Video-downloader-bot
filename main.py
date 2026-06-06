@@ -1,18 +1,19 @@
-import multiprocessing
 import os
 import yt_dlp
 from telegram import Update
-from telegram.ext import ApplicationBuilder,MessageHandler,filters,ContextTypes
+from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
+from flask import Flask
+import threading
 
-
-
-multiprocessing.set_start_method("spawn", force=True)
 TOKEN = os.getenv("TOKEN")
+
+# BOT
 app = ApplicationBuilder().token(TOKEN).build()
+
 def is_valid(url):
     return "tiktok.com" in url or "instagram.com" in url
 
-async def handle(update:Update,context:ContextTypes.DEFAULT_TYPE):
+async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text.strip()
 
     if not is_valid(url):
@@ -23,25 +24,15 @@ async def handle(update:Update,context:ContextTypes.DEFAULT_TYPE):
 
     ydl_opts = {
         'format': 'best',
-        'merge_output_format': 'mp4',
         'outtmpl': 'video.%(ext)s',
-        'noplaylist':True,
+        'noplaylist': True,
         'quiet': True,
-        'geo_bypass':True
-
     }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
-
-        size = os.path.getsize(filename)
-
-        if size>49*1024*1024:
-            os.remove(filename)
-            await msg.edit_text("Video size too large")
-            return
 
         await update.message.reply_video(video=open(filename, 'rb'))
         os.remove(filename)
@@ -50,9 +41,10 @@ async def handle(update:Update,context:ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await msg.edit_text(f"Error: {e}")
 
-from flask import Flask
-import threading
+# ✅ ADD HANDLER (THIS WAS MISSING)
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
 
+# FLASK
 flask_app = Flask(__name__)
 
 @flask_app.route("/")
@@ -69,5 +61,3 @@ if __name__ == "__main__":
     print("🔥 BOT FILE IS RUNNING")
     threading.Thread(target=run_web, daemon=True).start()
     run_bot()
-
-
