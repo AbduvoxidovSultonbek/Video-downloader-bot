@@ -47,9 +47,23 @@ async def handle(update:Update,context:ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await msg.edit_text(f"Error: {e}")
 
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(MessageHandler(filters.TEXT&~filters.COMMAND, handle))
+from flask import Flask
+import threading
 
-app.run_polling()
+flask_app = Flask(__name__)
+
+@flask_app.route("/")
+def home():
+    return "Bot is running"
+
+def run_web():
+    flask_app.run(host="0.0.0.0", port=10000)
+
+def run_bot():
+    app.run_polling()
+
+if __name__ == "__main__":
+    threading.Thread(target=run_web).start()
+    run_bot()
 
 
