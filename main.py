@@ -1,4 +1,4 @@
-
+print("🔥 BOT FILE IS RUNNING")
 
 import os
 import yt_dlp
