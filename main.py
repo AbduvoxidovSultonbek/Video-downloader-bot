@@ -5,8 +5,7 @@ import yt_dlp
 from telegram import Update
 from telegram.ext import ApplicationBuilder,MessageHandler,filters,ContextTypes
 
-TOKEN = "7469155829:AAEBuYTOgocOszms_KMe8Zh2p-46j4TBCA4"
-
+TOKEN = os.getenv("TOKEN")
 def is_valid(url):
     return "tiktok.com" in url or "instagram.com" in url
 
