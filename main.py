@@ -6,6 +6,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder,MessageHandler,filters,ContextTypes
 
 TOKEN = os.getenv("TOKEN")
+app = ApplicationBuilder().token(TOKEN).build()
 def is_valid(url):
     return "tiktok.com" in url or "instagram.com" in url
 
@@ -60,10 +61,12 @@ def run_web():
     flask_app.run(host="0.0.0.0", port=10000)
 
 def run_bot():
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
-    threading.Thread(target=run_web).start()
+    import threading
+    print("🔥 BOT FILE IS RUNNING")
+    threading.Thread(target=run_web, daemon=True).start()
     run_bot()
 
 
